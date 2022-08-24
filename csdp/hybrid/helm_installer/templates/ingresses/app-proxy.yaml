@@ -1,0 +1,17 @@
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: cap-app-proxy
+spec:
+  ingressClassName: {{ .Values.ingressClass }}
+  rules:
+  - host: {{ .Values.ingressHost }}
+    http:
+      paths:
+      - backend:
+          service:
+            name: cap-app-proxy
+            port:
+              number: 3017
+        path: /app-proxy
+        pathType: Prefix
