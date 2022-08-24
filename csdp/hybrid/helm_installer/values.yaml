@@ -1,0 +1,13 @@
+# User codefresh token used to register against the paltform
+codefresh-token:
+ingressHost: ilia-ingresshost.ngrok.io
+# Set your ingress class name
+ingressClass: nginx
+
+# The repository containing the manifests for runtime installation - structured like csdp-official
+runtimeRepo:
+  url: https://github.com/codefresh-sandbox/csdp-official
+  bootstrapPath: csdp/hybrid/basic/bootstrap
+  # To setup from specific revision, if not provided - chart version will be used
+  revision: helm_installer
+

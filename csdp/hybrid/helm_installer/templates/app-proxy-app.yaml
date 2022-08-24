@@ -1,0 +1,26 @@
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+    labels:
+        app.kubernetes.io/name: cap-app-proxy
+        codefresh.io/internal: "true"
+    name: cap-app-proxy
+    namespace: {{ .Release.Namespace }}
+    finalizers:
+    - 'resources-finalizer.argocd.argoproj.io'
+spec:
+    project: default
+    destination:
+        namespace: {{ .Release.Namespace }}
+        server: "https://kubernetes.default.svc"
+    source:
+        path: csdp/hybrid/basic/apps/app-proxy
+        repoURL: {{ .Values.runtimeRepo.url }}
+        targetRevision: {{ .Values.runtimeRepo.revision | default .Chart.Version }}
+    syncPolicy:
+        automated:
+            allowEmpty: true
+            prune: true
+            selfHeal: true
+        syncOptions:
+        - allowEmpty=true

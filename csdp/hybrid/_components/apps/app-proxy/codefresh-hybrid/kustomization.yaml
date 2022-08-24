@@ -1,0 +1,25 @@
+apiVersion: kustomize.config.k8s.io/v1alpha1
+kind: Component
+
+replacements:
+  # template the version from the configmap into the applicationset generators
+  - source:
+      kind: ConfigMap
+      name: codefresh-runtime-install-params
+      fieldPath: data.ingressHost
+    targets:
+      - select:
+          kind: Ingress
+          name: cap-app-proxy
+        fieldPaths:
+          - spec.rules.0.host
+  - source:
+      kind: ConfigMap
+      name: codefresh-runtime-install-params
+      fieldPath: data.ingressHost
+    targets:
+      - select:
+          kind: Ingress
+          name: cap-app-proxy
+        fieldPaths:
+          - spec.ingressClassName
