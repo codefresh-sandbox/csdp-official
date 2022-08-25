@@ -20,7 +20,7 @@ spec:
         - name: ARGOCD_INITIAL_TOKEN_SECRET_NAME
           value: argocd-initial-admin-secret
         - name: ARGOCD_TOKEN_SECRET_NAME
-          name: argocd-token
+          value: argocd-token
         image: "{{ .Values.runtimeInstallation.image.repository }}:{{ .Values.runtimeInstallation.image.tag | default .Chart.Version }}"
         imagePullPolicy: {{ .Values.runtimeInstallation.image.pullPolicy }}
         command: 
@@ -28,7 +28,7 @@ spec:
         - "-c"
         - |
           echo "  --> Reading ArgoCD intial admin token..."
-          INITIAL_PASSWORD=`kubectl -n ${NAMESPACE} get secret ${ARGOCD_INITIAL_TOKEN_SECRET_NAME} -o=jsonpath="{.data.password}" | base64 -d`
+          INITIAL_PASSWORD=$(kubectl -n ${NAMESPACE} get secret ${ARGOCD_INITIAL_TOKEN_SECRET_NAME} -o=jsonpath="{.data.password}" | base64 -d)
           echo ""
 
           echo "  --> Running ArgoCD login..."
@@ -36,16 +36,15 @@ spec:
           echo ""
 
           echo "  --> Generating ArgoCD API Key..."
-          ARGOCD_API_KEY=`argocd account generate-token -a admin --server argocd-server --plaintext`
+          ARGOCD_API_KEY=$(argocd account generate-token -a admin --server argocd-server --plaintext)
           echo ""
 
-          echo "
+          cat <<EOF | kubectl apply -f -
           apiVersion: v1
           kind: Secret
           metadata:
             name: $ARGOCD_TOKEN_SECRET_NAME
             namespace: $NAMESPACE
           stringData:
-              token: $ARGOCD_API_KEY
-          " | kubectl apply -f -
-          echo ""
+            token: $ARGOCD_API_KEY
+          EOF
