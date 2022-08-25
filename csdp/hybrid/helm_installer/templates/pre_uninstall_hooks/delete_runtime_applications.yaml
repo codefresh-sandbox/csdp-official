@@ -12,7 +12,8 @@ spec:
       serviceAccount: argocd-application-controller
       restartPolicy: Never
       containers:
-      - name: kubectl
-        image: "{{ .Values.kubectlImage }}"
+      - name: delete-runtime-resources
+        image: "{{ .Values.runtimeInstallation.image.repository }}:{{ .Values.runtimeInstallation.image.tag | default .Chart.Version }}"
+        imagePullPolicy: {{ .Values.runtimeInstallation.image.pullPolicy }}
         command: ["sh", "-c"]
         args: ["kubectl delete applicationset -l codefresh.io/internal=true --cascade=foreground"]

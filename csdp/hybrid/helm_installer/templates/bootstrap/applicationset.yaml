@@ -11,10 +11,10 @@ spec:
   generators:
   - git:
       directories:
-      - path: {{ .Values.runtimeRepo.appsPath }}/*
-      repoURL: {{ .Values.runtimeRepo.url }}
+      - path: {{ .Values.runtimeInstallation.repo.appsPath }}/*
+      repoURL: {{ .Values.runtimeInstallation.repo.url }}
       requeueAfterSeconds: 15
-      revision: {{ .Values.runtimeRepo.revision | default .Chart.Version }}
+      revision: {{ .Values.runtimeInstallation.repo.revision | default .Chart.Version }}
       template:
         metadata:
           finalizers:
@@ -30,10 +30,10 @@ spec:
             repoURL: ""
   - git:
       directories:
-      - path: {{ .Values.runtimeRepo.appsPath }}/argo-cd
-      repoURL: {{ .Values.runtimeRepo.url }}
+      - path: {{ .Values.runtimeInstallation.repo.appsPath }}/argo-cd
+      repoURL: {{ .Values.runtimeInstallation.repo.url }}
       requeueAfterSeconds: 15
-      revision: {{ .Values.runtimeRepo.revision | default .Chart.Version }}
+      revision: {{ .Values.runtimeInstallation.repo.revision | default .Chart.Version }}
       template:
         metadata: {}
         spec:
@@ -46,9 +46,9 @@ spec:
   # - git:
   #     files:
   #     - path: csdp/base_components/git-sources/**/config_dir.json
-  #     repoURL: {{ .Values.runtimeRepo.url }}
+  #     repoURL: {{ .Values.runtimeInstallation.repo.url }}
   #     requeueAfterSeconds: 15
-  #     revision: {{ .Values.runtimeRepo.revision | default .Chart.Version }}
+  #     revision: {{ .Values.runtimeInstallation.repo.revision | default .Chart.Version }}
   #     template:
   #       metadata:
   #         finalizers:
@@ -89,9 +89,9 @@ spec:
         kind: Application
       project: csdp
       source:
-        path: {{ .Values.runtimeRepo.appsPath }}/{{"{{"}}path.basenameNormalized{{"}}"}}
-        repoURL: {{ .Values.runtimeRepo.url }}
-        targetRevision: {{ .Values.runtimeRepo.revision | default .Chart.Version }}
+        path: {{ .Values.runtimeInstallation.repo.appsPath }}/{{"{{"}}path.basenameNormalized{{"}}"}}
+        repoURL: {{ .Values.runtimeInstallation.repo.url }}
+        targetRevision: {{ .Values.runtimeInstallation.repo.revision | default .Chart.Version }}
       syncPolicy:
         automated:
           allowEmpty: true

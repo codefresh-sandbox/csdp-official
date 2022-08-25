@@ -1,8 +1,8 @@
 apiVersion: v1
 data:
   appsetRequeueTime: "15"
-  bootstrapRevision: {{ .Values.runtimeRepo.revision | default .Chart.Version }}
-  version: {{ .Values.runtimeRepo.revision | default .Chart.Version }}
+  bootstrapRevision: {{ .Values.runtimeInstallation.repo.revision | default .Chart.Version }}
+  version: {{ .Values.runtimeInstallation.repo.revision | default .Chart.Version }}
 kind: ConfigMap
 metadata:
   name: codefresh-cm

@@ -1,0 +1,51 @@
+apiVersion: batch/v1
+kind: Job
+metadata:
+  name: create-argocd-token
+  annotations:
+    "helm.sh/hook": post-install
+    "helm.sh/hook-delete-policy": hook-succeeded
+    "helm.sh/hook-weight": "1"
+spec:
+  backoffLimit: 3
+  template:
+    spec:
+      serviceAccount: argocd-application-controller
+      restartPolicy: Never
+      containers:
+      - name: create-argocd-token
+        env:
+        - name: NAMESPACE
+          value: {{ .Release.Namespace }}
+        - name: ARGOCD_INITIAL_TOKEN_SECRET_NAME
+          value: argocd-initial-admin-secret
+        - name: ARGOCD_TOKEN_SECRET_NAME
+          name: argocd-token
+        image: "{{ .Values.runtimeInstallation.image.repository }}:{{ .Values.runtimeInstallation.image.tag | default .Chart.Version }}"
+        imagePullPolicy: {{ .Values.runtimeInstallation.image.pullPolicy }}
+        command: 
+        - "sh" 
+        - "-c"
+        - |
+          echo "  --> Reading ArgoCD intial admin token..."
+          INITIAL_PASSWORD=`kubectl -n ${NAMESPACE} get secret ${ARGOCD_INITIAL_TOKEN_SECRET_NAME} -o=jsonpath="{.data.password}" | base64 -d`
+          echo ""
+
+          echo "  --> Running ArgoCD login..."
+          argocd login argocd-server --plaintext --username admin --password $INITIAL_PASSWORD
+          echo ""
+
+          echo "  --> Generating ArgoCD API Key..."
+          ARGOCD_API_KEY=`argocd account generate-token -a admin --server argocd-server --plaintext`
+          echo ""
+
+          echo "
+          apiVersion: v1
+          kind: Secret
+          metadata:
+            name: $ARGOCD_TOKEN_SECRET_NAME
+            namespace: $NAMESPACE
+          stringData:
+              token: $ARGOCD_API_KEY
+          " | kubectl apply -f -
+          echo ""

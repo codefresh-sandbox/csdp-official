@@ -1,16 +1,46 @@
-# User codefresh token used to register against the paltform
-codefresh-token:
-ingressHost: ilia-ingresshost.ngrok.io
-# Set your ingress class name
-ingressClass: nginx
+  # CSDP platform details:
+platform:
+  # The Codefresh platform URL
+  url: https://g.codefresh.io
+  
+# This section contains values that are relevant for runtime installation. 
+runtimeInstallation:
+  # Codefresh API Key of the account you want to install the runtime for
+  token:
+    secretKeyRef:
+      name: codefresh-account-token
+      key: token
+  # This image is used for installation porposes, to register/de-register in platform, do registration and cleanup operations
+  image: 
+    repository: quay.io/codefresh/csdp-installer
+    pullPolicy: Always
+    # Default tag is the chart appVersion
+    tag: "latest"
+  # User codefresh token used for runtime installation (For creation of runtime on the platform)
+  codefresh-token:
+  # The repository containing the manifests for runtime installation - structured like csdp-official
+  repo:
+    url: https://github.com/codefresh-sandbox/csdp-official
+    appsPath: csdp/hybrid/basic/apps
+    # To setup from specific revision, if not provided - chart version will be used
+    revision: helm_installer
 
-# The repository containing the manifests for runtime installation - structured like csdp-official
-runtimeRepo:
-  url: https://github.com/codefresh-sandbox/csdp-official
-  appsPath: csdp/hybrid/basic/apps
-  # To setup from specific revision, if not provided - chart version will be used
-  revision: helm_installer
+runtime:
+  ingressHost: ilia-ingresshost.ngrok.io
+  # Set your ingress class name
+  ingressClass: nginx
+  
+  gitIntegration:
+    # Git Provider
+    provider: 
+      name: GITHUB
+      apiUrl: "https://api.github.com"
 
-# This installer requires an image with Kubectl to run hooks
-kubectlImage: bitnami/kubectl:latest
+    credentialsTemplate: #ArgoCD credentials template, see https://argo-cd.readthedocs.io/en/stable/operator-manual/declarative-setup/#repository-credentials
+      url: https://github.com/codefresh-sandbox # Credentials will apply to all repositories beggining with this URL
+      username: username
+      password:
+        secretKeyRef:
+          name: codefresh-account-token
+          key: token
 
