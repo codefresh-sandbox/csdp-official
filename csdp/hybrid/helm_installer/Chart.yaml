@@ -1,6 +1,10 @@
 apiVersion: v2
 name: codefresh-v2-runtime
-description: A Helm chart for Kubernetes
+description: codefresh-v2-runtime installation (From git repository)
 type: application
 version: 0.0.484
+# dependencies:
+#   - name: cf-argocd
+#     version: 0.0.484
+#     repository: "file://dependencies/argocd"
 appVersion: "0.0.484"

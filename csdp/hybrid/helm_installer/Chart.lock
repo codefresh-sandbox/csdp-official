@@ -1,0 +1,6 @@
+dependencies:
+- name: cf-argocd
+  repository: file://dependencies/argocd
+  version: 0.0.484
+digest: sha256:1d589c61a74e56d42b81e3cd5eb9f71c93bfb292cb61abe776cf88ba38526fdc
+generated: "2022-08-24T13:44:50.335129+03:00"

@@ -1,0 +1,6 @@
+apiVersion: v2
+name: cf-argocd
+description: cf-argocd
+type: application
+version: 0.0.484
+appVersion: "0.0.484"

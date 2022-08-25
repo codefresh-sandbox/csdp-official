@@ -1,0 +1,99 @@
+apiVersion: argoproj.io/v1alpha1
+kind: ApplicationSet
+metadata:
+  annotations:
+    argocd.argoproj.io/sync-wave: "0"
+  labels:
+    codefresh.io/internal: "true"
+  name: csdp
+  namespace: {{ .Release.Namespace }}
+spec:
+  generators:
+  - git:
+      directories:
+      - path: {{ .Values.runtimeRepo.appsPath }}/*
+      repoURL: {{ .Values.runtimeRepo.url }}
+      requeueAfterSeconds: 15
+      revision: {{ .Values.runtimeRepo.revision | default .Chart.Version }}
+      template:
+        metadata:
+          finalizers:
+          - resources-finalizer.argocd.argoproj.io
+          labels:
+            codefresh.io/internal: "true"
+        spec:
+          destination: {}
+          project: ""
+          source:
+            kustomize:
+              forceNamespace: true
+            repoURL: ""
+  - git:
+      directories:
+      - path: {{ .Values.runtimeRepo.appsPath }}/argo-cd
+      repoURL: {{ .Values.runtimeRepo.url }}
+      requeueAfterSeconds: 15
+      revision: {{ .Values.runtimeRepo.revision | default .Chart.Version }}
+      template:
+        metadata: {}
+        spec:
+          destination: {}
+          project: ""
+          source:
+            kustomize:
+              forceNamespace: true
+            repoURL: ""
+  # - git:
+  #     files:
+  #     - path: csdp/base_components/git-sources/**/config_dir.json
+  #     repoURL: {{ .Values.runtimeRepo.url }}
+  #     requeueAfterSeconds: 15
+  #     revision: {{ .Values.runtimeRepo.revision | default .Chart.Version }}
+  #     template:
+  #       metadata:
+  #         finalizers:
+  #         - resources-finalizer.argocd.argoproj.io
+  #         labels:
+  #           codefresh.io/entity: '{{"{{"}}labels.codefresh_io_entity{{"}}"}}'
+  #           codefresh.io/internal: '{{"{{"}}labels.codefresh_io_internal{{"}}"}}'
+  #       spec:
+  #         destination: {}
+  #         project: ""
+  #         source:
+  #           directory:
+  #             exclude: '{{"{{"}}exclude{{"}}"}}'
+  #             include: '{{"{{"}}include{{"}}"}}'
+  #             recurse: true
+  #           path: '{{"{{"}}srcPath{{"}}"}}'
+  #           repoURL: '{{"{{"}}srcRepoURL{{"}}"}}'
+  #           targetRevision: '{{"{{"}}srcTargetRevision{{"}}"}}'
+  syncPolicy:
+    preserveResourcesOnDeletion: true
+  template:
+    metadata:
+      labels:
+        app.kubernetes.io/name: '{{"{{"}}path.basenameNormalized{{"}}"}}'
+        codefresh.io/entity: component
+        codefresh.io/internal: "true"
+
+      name: csdp-{{"{{"}}path.basenameNormalized{{"}}"}}
+      namespace: {{ .Release.Namespace }}
+    spec:
+      destination:
+        namespace: {{ .Release.Namespace }}
+        server: https://kubernetes.default.svc
+      ignoreDifferences:
+      - group: argoproj.io
+        jsonPointers:
+        - /status
+        kind: Application
+      project: csdp
+      source:
+        path: {{ .Values.runtimeRepo.appsPath }}/{{"{{"}}path.basenameNormalized{{"}}"}}
+        repoURL: {{ .Values.runtimeRepo.url }}
+        targetRevision: {{ .Values.runtimeRepo.revision | default .Chart.Version }}
+      syncPolicy:
+        automated:
+          allowEmpty: true
+          prune: true
+          selfHeal: true

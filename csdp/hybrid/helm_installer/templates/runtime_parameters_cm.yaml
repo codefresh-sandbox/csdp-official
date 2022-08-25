@@ -1,7 +1,0 @@
-apiVersion: v1
-kind: ConfigMap
-metadata:
-  name: codefresh-runtime-install-params
-data:
-  ingressHost: {{ .Values.ingressHost }}
-  ingreeClass: {{ .Values.ingressClass }}

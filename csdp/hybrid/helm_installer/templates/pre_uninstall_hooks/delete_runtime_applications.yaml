@@ -1,0 +1,18 @@
+apiVersion: batch/v1
+kind: Job
+metadata:
+  name: delete-runtime-applications
+  annotations:
+    "helm.sh/hook": pre-delete
+    "helm.sh/hook-delete-policy": hook-succeeded
+spec:
+  backoffLimit: 3
+  template:
+    spec:
+      serviceAccount: argocd-application-controller
+      restartPolicy: Never
+      containers:
+      - name: kubectl
+        image: "{{ .Values.kubectlImage }}"
+        command: ["sh", "-c"]
+        args: ["kubectl delete applicationset -l codefresh.io/internal=true --cascade=foreground"]
