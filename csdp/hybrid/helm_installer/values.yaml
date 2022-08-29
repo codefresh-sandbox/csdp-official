@@ -25,7 +25,7 @@ runtimeInstallation:
     revision: helm_installer
 
 runtime:
-  name: helm-installed-runtime2
+  name: helm-installed-runtime3
   ingressHost: ilia-ingresshost.ngrok.io
   # Set your ingress class name
   ingressClass: nginx
