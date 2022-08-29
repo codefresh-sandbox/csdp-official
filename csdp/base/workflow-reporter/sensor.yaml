@@ -33,5 +33,5 @@ spec:
                 secretKeyRef:
                   key: token
                   name: codefresh-token
-          url: CF_HOST
+          url: https://g.codefresh.io
         name: workflows

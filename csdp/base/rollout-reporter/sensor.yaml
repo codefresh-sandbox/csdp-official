@@ -39,7 +39,7 @@ spec:
                 secretKeyRef:
                   key: token
                   name: codefresh-token
-          url: CF_HOST
+          url: https://g.codefresh.io
         name: rollouts
     - retryStrategy:
         duration: 0
@@ -61,7 +61,7 @@ spec:
                 secretKeyRef:
                   key: token
                   name: codefresh-token
-          url: CF_HOST
+          url: https://g.codefresh.io
         name: replicasets
     - retryStrategy:
         duration: 0
@@ -83,5 +83,5 @@ spec:
                 secretKeyRef:
                   key: token
                   name: codefresh-token
-          url: CF_HOST
+          url: https://g.codefresh.io
         name: analysisruns
