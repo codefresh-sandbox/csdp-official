@@ -3,9 +3,9 @@ kind: Ingress
 metadata:
   name: cap-app-proxy
 spec:
-  ingressClassName: {{ .Values.ingressClass }}
+  ingressClassName: {{ .Values.runtime.ingressClass }}
   rules:
-  - host: {{ .Values.ingressHost }}
+  - host: {{ .Values.runtime.ingressHost }}
     http:
       paths:
       - backend:
