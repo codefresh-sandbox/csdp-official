@@ -4,7 +4,7 @@ metadata:
   name: create-argocd-token
   annotations:
     "helm.sh/hook": post-install
-    "helm.sh/hook-delete-policy": hook-succeeded
+    "helm.sh/hook-delete-policy": hook-succeeded,before-hook-creation
     "helm.sh/hook-weight": "1"
 spec:
   backoffLimit: 3

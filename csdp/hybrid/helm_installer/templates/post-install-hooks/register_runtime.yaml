@@ -1,0 +1,117 @@
+apiVersion: batch/v1
+kind: Job
+metadata:
+  name: register-runtime
+  annotations:
+    "helm.sh/hook": post-install
+    "helm.sh/hook-delete-policy": hook-succeeded,before-hook-creation
+    "helm.sh/hook-weight": "2"
+spec:
+  backoffLimit: 3
+  template:
+    spec:
+      serviceAccount: argocd-application-controller
+      restartPolicy: Never
+      containers:
+      - name: register-runtime
+        env:
+        - name: NAMESPACE
+          value: {{ .Release.Namespace }}
+        - name: PLATFORM_URL
+          value: {{ .Values.platform.url }}
+        - name: CODEFRESH_USER_TOKEN
+          valueFrom:
+            secretKeyRef:
+              name: {{ .Values.runtimeInstallation.token.secretKeyRef.name | default "codefresh-user-token" }}
+              key: {{ .Values.runtimeInstallation.token.secretKeyRef.key | default "token" }}
+        - name: CSDP_RUNTIME_REPO
+          value: {{ .Values.runtimeInstallation.repo.url }}
+        - name: CSDP_RUNTIME_NAME
+          value: {{ .Values.runtime.name | default .Release.Name }}
+        - name: CSDP_RUNTIME_INGRESS_URL
+          value: {{ .Values.runtime.ingressUrl }}
+        - name: CSDP_INGRESS_CLASS_NAME
+          value: {{ .Values.runtime.ingressClass }}
+        - name: CSDP_INGRESS_CONTROLLER
+          value: 'nginx'
+        - name: RUNTIME_VERSION
+          value: {{ .Values.runtimeInstallation.repo.revision | default .Chart.Version }}
+        - name: CODEFRESH_SECRET_NAME
+          value: 'codefresh-token'
+        image: "{{ .Values.runtimeInstallation.image.repository }}:{{ .Values.runtimeInstallation.image.tag | default .Chart.Version }}"
+        imagePullPolicy: {{ .Values.runtimeInstallation.image.pullPolicy }}
+        command: 
+        - "bash" 
+        - "-c"
+        - |
+          COMPONENTS="argo-events,app-proxy,argo-cd,events-reporter,argo-rollouts,rollout-reporter,argo-workflows,workflow-reporter,sealed-secrets"
+
+          COMPONENT_NAMES=`echo ${COMPONENTS} | tr ',' ' '`
+          COMPONENTS=""
+
+          for COMPONENT in $COMPONENT_NAMES; do
+              CUR_COMPONENT=`echo -n "\"csdp-${COMPONENT}\""`
+              COMPONENTS="${CUR_COMPONENT} ${COMPONENTS}"
+              echo $COMPONENTS
+          done
+
+          COMPONENTS=`echo $COMPONENTS | tr ' ' ','`
+          COMPONENTS="[${COMPONENTS}]"
+
+          CSDP_RUNTIME_CLUSTER="https://kubernetes.default.svc"
+          echo "Checking secret $CODEFRESH_SECRET_NAME..."
+          if kubectl -n "$NAMESPACE" get secret "$CODEFRESH_SECRET_NAME"; then
+              echo "  --> Secret $CODEFRESH_SECRET_NAME exists"
+          else
+              echo "  --> Secret $CODEFRESH_SECRET_NAME doesn't exists."
+              echo ""
+              
+              RUNTIME_CREATE_ARGS="{
+              \"repo\": \"${CSDP_RUNTIME_REPO}\",
+              \"runtimeName\":\"${CSDP_RUNTIME_NAME}\",
+              \"cluster\":\"${CSDP_RUNTIME_CLUSTER}\",
+              \"ingressHost\":\"${CSDP_RUNTIME_INGRESS_URL}\",
+              \"ingressClass\":\"${CSDP_INGRESS_CLASS_NAME}\",
+              \"ingressController\":\"${CSDP_INGRESS_CONTROLLER}\",
+              \"componentNames\":${COMPONENTS},
+              \"runtimeVersion\":\"v0.0.0\",
+              \"managed\":false
+              }"
+
+              RUNTIME_CREATE_DATA="{\"operationName\":\"CreateRuntime\",\"variables\":{\"args\":$RUNTIME_CREATE_ARGS}"
+              RUNTIME_CREATE_DATA+=$',"query":"mutation CreateRuntime($args: RuntimeInstallationArgs\u0021) {\\n  createRuntime(installationArgs: $args) {\\n    name\\n    newAccessToken\\n  }\\n}\\n"}'
+              echo "  --> Creating runtime with args:"
+              echo "$RUNTIME_CREATE_ARGS"
+
+              RUNTIME_CREATE_RESPONSE=`curl "${PLATFORM_URL}/2.0/api/graphql" \
+              -SsfL \
+              -H "Authorization: ${CODEFRESH_USER_TOKEN}" \
+              -H 'content-type: application/json' \
+              --compressed \
+              --insecure \
+              --data-raw "$RUNTIME_CREATE_DATA"`
+
+              if `echo "$RUNTIME_CREATE_RESPONSE" | jq -e 'has("errors")'`; then
+                  echo "Failed to create runtime"
+                  echo ${RUNTIME_CREATE_RESPONSE}
+                  exit 1
+              fi
+
+              CSDP_RUNTIME_TOKEN=`echo $RUNTIME_CREATE_RESPONSE | jq '.data.createRuntime.newAccessToken'`
+
+              RUNTIME_ENCRYPTION_IV=`hexdump -n 16 -e '4/4 "%08x" 1 "\n"' /dev/urandom`
+              echo "  --> Runtime created!"
+              echo ""
+
+              echo "  --> Creating $CODEFRESH_SECRET_NAME secret..."
+              echo "
+              apiVersion: v1
+              kind: Secret
+              metadata:
+                  name: $CODEFRESH_SECRET_NAME
+                  namespace: $NAMESPACE
+              stringData:
+                  token: $CSDP_RUNTIME_TOKEN
+                  encryptionIV: $RUNTIME_ENCRYPTION_IV
+              " | kubectl apply -f -
+          fi

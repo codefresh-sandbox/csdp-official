@@ -8,7 +8,7 @@ runtimeInstallation:
   # Codefresh API Key of the account you want to install the runtime for
   token:
     secretKeyRef:
-      name: codefresh-account-token
+      name: codefresh-user-token
       key: token
   # This image is used for installation porposes, to register/de-register in platform, do registration and cleanup operations
   image: 
@@ -16,8 +16,7 @@ runtimeInstallation:
     pullPolicy: Always
     # Default tag is the chart appVersion
     tag: "latest"
-  # User codefresh token used for runtime installation (For creation of runtime on the platform)
-  codefresh-token:
+  
   # The repository containing the manifests for runtime installation - structured like csdp-official
   repo:
     url: https://github.com/codefresh-sandbox/csdp-official
@@ -26,9 +25,11 @@ runtimeInstallation:
     revision: helm_installer
 
 runtime:
+  name: helm-installed-runtime2
   ingressHost: ilia-ingresshost.ngrok.io
   # Set your ingress class name
   ingressClass: nginx
+  ingressUrl: https://ilia-ingresshost.ngrok.io
   
   gitIntegration:
     # Git Provider
@@ -43,4 +44,3 @@ runtime:
         secretKeyRef:
           name: codefresh-account-token
           key: token
-

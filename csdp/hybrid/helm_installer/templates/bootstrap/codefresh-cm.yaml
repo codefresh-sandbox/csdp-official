@@ -3,6 +3,7 @@ data:
   appsetRequeueTime: "15"
   bootstrapRevision: {{ .Values.runtimeInstallation.repo.revision | default .Chart.Version }}
   version: {{ .Values.runtimeInstallation.repo.revision | default .Chart.Version }}
+  base-url: {{ .Values.platform.url }}
 kind: ConfigMap
 metadata:
   name: codefresh-cm
