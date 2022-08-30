@@ -27,10 +27,10 @@ spec:
           source:
             plugin:
               name: kustomize-sed
-              forceNamespace: true
               env:
               - name: SED_EXPRESSION
-                value: "s/CF_RUNTIME_INGRESS_CLASS/{{ .Values.runtime.ingressClass}}/g;s/CF_RUNTIME_INGRESS_HOST/{{ .Values.runtime.ingressHost}}/g;s/CF_RUNTIME_NAMESPACE/{{ .Release.Namespace }}/g"
+                value: {{ include "kustomize-sed-replacements.sed-expression-builder" . }}
+                #value: "s/CF_RUNTIME_INGRESS_CLASS/{{ .Values.runtime.ingressClass}}/g;s/CF_RUNTIME_INGRESS_HOST/{{ .Values.runtime.ingressHost}}/g;s/CF_RUNTIME_NAMESPACE/{{ .Release.Namespace }}/g"
             # kustomize:
             #   forceNamespace: true
             repoURL: ""

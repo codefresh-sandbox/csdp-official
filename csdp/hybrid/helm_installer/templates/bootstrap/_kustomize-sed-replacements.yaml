@@ -1,0 +1,17 @@
+# In kustomize some values are defined to be replaced, we are overriding those values through kustomize-sed plugin through the application set.
+# These templates are used to render the replacement expression for sed, to map the placeholders in Kustomize to values in values file.
+{{- define "kustomize-sed-replacements.key-value-map"}}
+CF_RUNTIME_NAMESPACE: {{ .Release.Namespace }}
+CF_RUNTIME_INGRESS_CLASS: {{ .Values.runtime.ingressClass }}
+CF_RUNTIME_INGRESS_HOST: {{ .Values.runtime.ingressHost }}
+CF_PLATFORM_EVENTS_URL: "{{ .Values.platform.url}}{{ .Values.platform.eventsEndpoing }}"
+{{- end }}
+
+{{- define "kustomize-sed-replacements.sed-expression-builder"}}
+{{- $replacements := include "kustomize-sed-replacements.key-value-map" . | fromYaml }}
+  {{- $sedExp := ""}}
+  {{- range $placeholder,$value := $replacements }}
+    {{- $sedExp = (print $sedExp (printf "s/%s/%s/g;" $placeholder $value)) }}
+  {{- end}}
+{{- $sedExp }}
+{{- end }}

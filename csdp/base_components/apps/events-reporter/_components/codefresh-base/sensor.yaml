@@ -31,5 +31,5 @@ spec:
             secretKeyRef:
               key: token
               name: codefresh-token
-        url: https://g.codefresh.io/2.0/api/events
+        url: CF_PLATFORM_EVENTS_URL
       name: events

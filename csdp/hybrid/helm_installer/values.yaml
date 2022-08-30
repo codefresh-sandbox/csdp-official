@@ -2,6 +2,7 @@
 platform:
   # The Codefresh platform URL
   url: https://g.codefresh.io
+  eventsEndpoing: "/2.0/api/events"
   
 # This section contains values that are relevant for runtime installation. 
 runtimeInstallation:
@@ -31,16 +32,16 @@ runtime:
   ingressClass: nginx
   ingressUrl: https://ilia-ingresshost.ngrok.io
   
-  gitIntegration:
-    # Git Provider
-    provider: 
-      name: GITHUB
-      apiUrl: "https://api.github.com"
+  # gitIntegration:
+  #   # Git Provider
+  #   provider: 
+  #     name: GITHUB
+  #     apiUrl: "https://api.github.com"
 
-    credentialsTemplate: #ArgoCD credentials template, see https://argo-cd.readthedocs.io/en/stable/operator-manual/declarative-setup/#repository-credentials
-      url: https://github.com/codefresh-sandbox # Credentials will apply to all repositories beggining with this URL
-      username: username
-      password:
-        secretKeyRef:
-          name: codefresh-account-token
-          key: token
+  #   credentialsTemplate: #ArgoCD credentials template, see https://argo-cd.readthedocs.io/en/stable/operator-manual/declarative-setup/#repository-credentials
+  #     url: https://github.com/codefresh-sandbox # Credentials will apply to all repositories beggining with this URL
+  #     username: username
+  #     password:
+  #       secretKeyRef:
+  #         name: codefresh-account-token
+  #         key: token
