@@ -11,6 +11,7 @@ CF_PLATFORM_EVENTS_URL: "{{ .Values.platform.url}}{{ .Values.platform.eventsEndp
 {{- $replacements := include "kustomize-sed-replacements.key-value-map" . | fromYaml }}
   {{- $sedExp := ""}}
   {{- range $placeholder,$value := $replacements }}
+    {{- $value = $value | replace "/" "\\/" }}
     {{- $sedExp = (print $sedExp (printf "s/%s/%s/g;" $placeholder $value)) }}
   {{- end}}
 {{- $sedExp }}
