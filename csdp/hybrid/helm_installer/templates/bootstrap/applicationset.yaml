@@ -92,6 +92,12 @@ spec:
         path: {{ .Values.runtimeInstallation.repo.appsPath }}/{{"{{"}}path.basenameNormalized{{"}}"}}
         repoURL: {{ .Values.runtimeInstallation.repo.url }}
         targetRevision: {{ .Values.runtimeInstallation.repo.revision | default .Chart.Version }}
+        # Use kustomize sed plugin to repace fields
+        plugin:
+          name: kustomize-sed
+          env:
+          - name: SED_EXPRESSION
+            value: "s/CF_RUNTIME_INGRESS_CLASS/{{ .Values.runtime.ingressClass}}/g;s/CF_RUNTIME_INGRESS_HOST/{{ .Values.runtime.ingressHost}}/g"
       syncPolicy:
         automated:
           allowEmpty: true
