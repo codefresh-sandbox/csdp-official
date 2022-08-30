@@ -5,5 +5,5 @@ components:
   - ../../../../base_components/apps/app-proxy/_bundles/basic
   - ../../../_components/apps/app-proxy/codefresh-hybrid
 
-patchesStrategicMerge:
-- delete-ingress.yaml
+# patchesStrategicMerge:
+# - delete-ingress.yaml
