@@ -27,7 +27,7 @@ spec:
         - name: CSDP_RUNTIME_REPO
           value: {{ .Values.runtimeInstallation.repo.url }}
         - name: CSDP_RUNTIME_NAME
-          value: {{ .Values.runtime.name | default .Release.Name }}
+          value: {{ .Release.Namespace }}
         - name: CSDP_RUNTIME_INGRESS_URL
           value: {{ .Values.runtime.ingressUrl }}
         - name: CSDP_INGRESS_CLASS_NAME

@@ -4,7 +4,7 @@ data:
   bootstrapRevision: {{ .Values.runtimeInstallation.repo.revision | default .Chart.Version }}
   version: {{ .Values.runtimeInstallation.repo.revision | default .Chart.Version }}
   base-url: {{ .Values.platform.url }}
-  runtimeName: {{ .Values.runtime.name }}
+  runtimeName: {{ .Release.Namespace }}
 kind: ConfigMap
 metadata:
   name: codefresh-cm

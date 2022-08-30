@@ -32,6 +32,9 @@ runtime:
   ingressClass: nginx
   ingressUrl: https://ilia-ingresshost.ngrok.io
   
+
+
+  
   # gitIntegration:
   #   # Git Provider
   #   provider: 
