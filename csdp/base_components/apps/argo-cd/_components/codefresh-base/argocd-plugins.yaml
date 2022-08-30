@@ -1,0 +1,9 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: argocd-cm
+data:
+  configManagementPlugins: |
+    - name: kustomize-sed
+      generate:
+        command: ["sh", "-c", "kustomize build | sed $SED_EXPRESSION"]

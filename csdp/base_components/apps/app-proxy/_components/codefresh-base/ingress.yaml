@@ -3,9 +3,9 @@ kind: Ingress
 metadata:
   name: cap-app-proxy
 spec:
-  ingressClassName: REPLACE_ME
+  ingressClassName: CF_RUNTIME_INGRESS_CLASS
   rules:
-  - host: REPLACE_ME
+  - host: CF_RUNTIME_INGRESS_HOST
     http:
       paths:
       - backend:

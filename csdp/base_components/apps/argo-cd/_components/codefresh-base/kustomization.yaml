@@ -20,6 +20,9 @@ configMapGenerator:
     literals:
       - server.insecure=true
 
+patchesStrategicMerge:
+  - argocd-plugins.yaml
+
 # reset the crbs to `subject.namespace: default`, so that argo-cd will later change them to the actual ns
 patches:
   - target:
