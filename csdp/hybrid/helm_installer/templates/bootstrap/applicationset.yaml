@@ -25,8 +25,14 @@ spec:
           destination: {}
           project: ""
           source:
-            kustomize:
+            plugin:
+              name: kustomize-sed
               forceNamespace: true
+              env:
+              - name: SED_EXPRESSION
+                value: "s/CF_RUNTIME_INGRESS_CLASS/{{ .Values.runtime.ingressClass}}/g;s/CF_RUNTIME_INGRESS_HOST/{{ .Values.runtime.ingressHost}}/g;s/CF_RUNTIME_NAMESPACE/{{ .Release.Namespace }}/g"
+            # kustomize:
+            #   forceNamespace: true
             repoURL: ""
   - git:
       directories:
@@ -41,13 +47,8 @@ spec:
           project: ""
           source:
             # Use kustomize sed plugin to repace fields
-            plugin:
-              name: kustomize-sed
-              env:
-              - name: SED_EXPRESSION
-                value: "s/CF_RUNTIME_INGRESS_CLASS/{{ .Values.runtime.ingressClass}}/g;s/CF_RUNTIME_INGRESS_HOST/{{ .Values.runtime.ingressHost}}/g"
-            # kustomize:
-            #   forceNamespace: true
+            kustomize:
+              forceNamespace: true
             repoURL: ""
   # - git:
   #     files:

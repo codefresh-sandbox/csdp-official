@@ -424,6 +424,10 @@ apiVersion: v1
 data:
   accounts.admin: apiKey,login
   timeout.reconciliation: 20s
+  configManagementPlugins: |
+    - name: kustomize-sed
+      generate:
+        command: ["sh", "-c", "kustomize build | sed $SED_EXPRESSION"]
 kind: ConfigMap
 metadata:
   labels:

@@ -3,3 +3,4 @@ kind: Kustomization
 
 components:
   - ../../../../base_components/apps/workflow-reporter/_bundles/basic
+namespace: CF_RUNTIME_NAMESPACE

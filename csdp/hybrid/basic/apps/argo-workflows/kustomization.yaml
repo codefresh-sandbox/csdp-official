@@ -4,3 +4,5 @@ kind: Kustomization
 components:
   - ../../../../base_components/apps/argo-workflows/_bundles/basic
   #- ../../../_components/apps/argo-workflows/codefresh-hybrid
+
+namespace: CF_RUNTIME_NAMESPACE
